@@ -21,8 +21,10 @@ final class StereoRenderer: NSObject, MTKViewDelegate {
     let device: MTLDevice
     let scene: StereoScene
     var configuration: StereoConfiguration
-    /// Supplies the head orientation each frame.
-    var orientationProvider: () -> simd_quatf = { simd_quatf(angle: 0, axis: [0, 1, 0]) }
+    /// Supplies the head pose (scene-space position and orientation) each frame, after `scene.update`.
+    var poseProvider: () -> (position: SIMD3<Float>, orientation: simd_quatf) = {
+        ([0, 1.6, 0], simd_quatf(angle: 0, axis: [0, 1, 0]))
+    }
 
     private let queue: MTLCommandQueue
     private let scenePipeline: MTLRenderPipelineState
@@ -138,7 +140,8 @@ final class StereoRenderer: NSObject, MTKViewDelegate {
         let aspect = Float(eyeWidth) / Float(height)
         let projection = float4x4.perspective(fovY: cfg.verticalFieldOfView * .pi / 180,
                                               aspect: aspect, near: cfg.nearZ, far: cfg.farZ)
-        let head = float4x4(translation: scene.cameraPosition) * float4x4(rotation: orientationProvider())
+        let pose = poseProvider()
+        let head = float4x4(translation: pose.position) * float4x4(rotation: pose.orientation)
         let fogDensity = scene.fogDensity
         let light = scene.lightDirection
 

@@ -15,6 +15,16 @@ public final class MotionTracker {
 
     public var isMotionAvailable: Bool { manager.isDeviceMotionAvailable }
 
+    /// User acceleration along the upward (anti-gravity) direction, in g. Nil without sensors.
+    public var verticalAcceleration: Float? {
+        guard let motion = manager.deviceMotion else { return nil }
+        let g = motion.gravity
+        let a = motion.userAcceleration
+        let length = (g.x * g.x + g.y * g.y + g.z * g.z).squareRoot()
+        guard length > 0 else { return nil }
+        return Float(-(a.x * g.x + a.y * g.y + a.z * g.z) / length)
+    }
+
     public init() {}
 
     public func start() {

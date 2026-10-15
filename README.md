@@ -44,6 +44,21 @@ StereoViewerView(scene: MyScene(),
 - Landscape only (portrait shows a hint).
 - Double-tap: recenter heading.
 - Drag: nudge heading (also pitch in Simulator, where there are no sensors).
+- Long-press: cycle navigation mode (a banner shows the new mode in each eye).
+
+## Navigation modes
+
+Set `StereoConfiguration.navigationMode` (or long-press in the viewer):
+
+- `.lookAround` (default) – head rotation only.
+- `.walkInPlace` – walk or jog in place to move forward in the direction you're facing.
+  Steps are detected from the phone's vertical bounce; tune with `walkSpeed` and `stepThreshold`.
+- `.orbit(distance:)` – turning your head circles you around a point `distance` meters
+  ahead of the start position while you keep facing it (look down to see it from above).
+
+```swift
+StereoViewerView(configuration: .init(navigationMode: .walkInPlace, walkSpeed: 1.5))
+```
 
 ## How it works
 
